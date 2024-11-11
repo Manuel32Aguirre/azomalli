@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "447243540021",
+    "project_id": "azomalli-6b783",
+    "storage_bucket": "azomalli-6b783.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447243540021:android:ffa31769153c596250837c",
+        "android_client_info": {
+          "package_name": "com.example.azomalli"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCekFrAaDCNE7WrcHOcoGFt6o41c7JaIXg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

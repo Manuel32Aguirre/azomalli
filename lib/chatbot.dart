@@ -10,7 +10,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  TextEditingController _userInput = TextEditingController();
+  final TextEditingController _userInput = TextEditingController();
   ScrollController scrollController = ScrollController();
   List<Message> msgs = [];
   bool isTyping = false;

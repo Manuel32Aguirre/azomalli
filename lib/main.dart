@@ -1,12 +1,13 @@
 import 'package:azomalli/menuPrincipal.dart';
-import 'package:azomalli/menuPrincipal.dart';
 import 'package:azomalli/registro.dart';
+import 'package:azomalli/registroDatos.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 import 'firebase_options.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,8 +66,8 @@ class Inicio extends StatefulWidget {
 }
 
 class _InicioState extends State<Inicio> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _signInWithEmail() async {
     try {
@@ -80,27 +81,41 @@ class _InicioState extends State<Inicio> {
 
       if (user != null) {
         if (user.emailVerified) {
-          // Mostrar el mensaje de éxito y luego navegar a la siguiente pantalla
+          // Verificamos si ya existe la colección para este usuario
+
+          // Mostrar mensaje de éxito
           _showAwesomeDialog(
               "¡Has iniciado sesión exitosamente!", DialogType.success);
+          // Verificamos si el campo nombreUsuario está vacío
+          DocumentSnapshot userDoc = await FirebaseFirestore.instance
+              .collection('usuarios')
+              .doc(user.uid)
+              .get();
 
-          // Navegar a la siguiente pantalla después de la notificación
-          Future.delayed(const Duration(seconds: 2), () {
+          var userData = userDoc.data() as Map<String, dynamic>;
+          if (userData['nombreUsuario'] == '') {
+            // Si nombreUsuario está vacío, redirigimos a la pantalla de registro
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const RegistroDatos()),
+            );
+          } else {
+            // Si nombreUsuario no está vacío, redirigimos a la segunda pantalla
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) =>
-                    const SegundaPantalla(), // Aquí va la segunda pantalla
+                    SegundaPantalla(userName: userData['nombreUsuario']),
               ),
             );
-          });
+          }
         } else {
           // Si el correo no está verificado, muestra una alerta
           _showVerificationAlert();
         }
       }
     } catch (e) {
-      String errorMessage;
+      String errorMessage = "Error desconocido al intentar iniciar sesión.";
 
       if (e is FirebaseAuthException) {
         switch (e.code) {
@@ -120,14 +135,14 @@ class _InicioState extends State<Inicio> {
             errorMessage = "Ocurrió un error inesperado: ${e.message}";
             break;
         }
-      } else {
-        errorMessage = "Error desconocido al intentar iniciar sesión.";
       }
 
-      // Mostrar mensaje de error con AwesomeDialog en color rojo
+      // Mostrar mensaje de error con AwesomeDialog
       _showAwesomeDialog(errorMessage, DialogType.error);
     }
   }
+
+  // Función para crear la colección del usuario en Firestore
 
   // Función para mostrar AwesomeDialog con color personalizado
   void _showAwesomeDialog(String message, DialogType dialogType) {

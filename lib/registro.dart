@@ -2,6 +2,7 @@ import 'package:azomalli/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Registro extends StatefulWidget {
   const Registro({super.key});
@@ -11,9 +12,10 @@ class Registro extends StatefulWidget {
 }
 
 class _RegistroState extends State<Registro> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
@@ -28,27 +30,33 @@ class _RegistroState extends State<Registro> {
           password: _passwordController.text,
         );
 
-        // Enviar el correo de verificación
+        // Obtener el usuario recién creado
         User? user = userCredential.user;
-        if (user != null) {
-          await user.sendEmailVerification();
-        }
 
-        // Mostrar mensaje de éxito
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.success,
-          title: '¡Éxito!',
-          desc: 'Te hemos enviado un correo de verificación. Revisa tu correo.',
-          btnOkOnPress: () {
-            Future.delayed(const Duration(seconds: 1), () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const MiApp()),
-              );
-            });
-          },
-        ).show();
+        if (user != null) {
+          // Crear la colección del usuario en Firestore
+          await _createUserInFirestore(user);
+
+          // Enviar el correo de verificación
+          await user.sendEmailVerification();
+
+          // Mostrar mensaje de éxito
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.success,
+            title: '¡Éxito!',
+            desc:
+                'Te hemos enviado un correo de verificación. Revisa tu correo.',
+            btnOkOnPress: () {
+              Future.delayed(const Duration(seconds: 1), () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MiApp()),
+                );
+              });
+            },
+          ).show();
+        }
       } catch (e) {
         // Mostrar mensaje de error en caso de fallo
         ScaffoldMessenger.of(context).showSnackBar(
@@ -59,6 +67,29 @@ class _RegistroState extends State<Registro> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Las contraseñas no coinciden")),
       );
+    }
+  }
+
+  // Función para crear la colección del usuario en Firestore
+  Future<void> _createUserInFirestore(User user) async {
+    try {
+      // Crear el documento con los campos vacíos
+      await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(user.uid)
+          .set({
+        'nombre': '', // Nombres aún no asignados
+        'apellido': '', // Apellido paterno aún no asignado
+        'genero': '', // Género aún no asignado
+        'telefono': '', // Teléfono aún no asignado
+        'telefonoFamiliar': '', // Teléfono familiar aún no asignado
+        'nivelEstres': '', // El estado actual estará vacío por ahora
+        'edad': 0, // Edad aún no asignada
+        'estatura': 0.0, // Estatura aún no asignada
+        'nombreUsuario': '', // El nombre de usuario aún no se ha asignado
+      });
+    } catch (e) {
+      print("Error al crear la colección de usuario: $e");
     }
   }
 

@@ -1,18 +1,34 @@
-import 'package:azomalli/chatbot.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:azomalli/chatbot.dart';
 
 final FirebaseAuth auth = FirebaseAuth.instance;
 
-class SegundaPantalla extends StatelessWidget {
-  const SegundaPantalla({super.key});
+class SegundaPantalla extends StatefulWidget {
+  final String userName;
+
+  const SegundaPantalla({Key? key, required this.userName}) : super(key: key);
+
+  @override
+  _SegundaPantallaState createState() => _SegundaPantallaState();
+}
+
+class _SegundaPantallaState extends State<SegundaPantalla> {
+  @override
+  void initState() {
+    super.initState();
+    // Mostrar el Toast con el nombre del usuario
+    Fluttertoast.showToast(
+      msg: "Usuario actual: ${widget.userName}",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     // Obtener el usuario actual de Firebase
-    User? user = FirebaseAuth.instance.currentUser;
-    String userName = user?.displayName ?? "Usuario"; // Nombre de usuario
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -26,11 +42,11 @@ class SegundaPantalla extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
-                    "assets/img/azomalli.png", // Asegúrate de tener la imagen en la carpeta 'assets/img'
+                    "assets/img/azomalli.png",
                     width: 100,
                     height: 100,
                   ),
-                  const SizedBox(width: 10), // Espacio entre el logo y el texto
+                  const SizedBox(width: 10),
                   const Text(
                     "AZOMALLI",
                     style: TextStyle(
@@ -58,7 +74,7 @@ class SegundaPantalla extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                "Bienvenido, $userName",
+                "Bienvenido, ${widget.userName}",
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -74,11 +90,11 @@ class SegundaPantalla extends StatelessWidget {
                 onPressed: () {
                   // Aquí puedes agregar la lógica para navegar a la pantalla de estadísticas
                 },
-                child: const Text("Estadísticas"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // Color del botón
+                  backgroundColor: Colors.blue,
                   minimumSize: const Size(double.infinity, 50),
                 ),
+                child: const Text("Estadísticas"),
               ),
             ),
             const SizedBox(height: 10),

@@ -15,7 +15,7 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Message> msgs = [];
   bool isTyping = false;
 
-  static const apiKey = "AIzaSyCQS48fdzRQNrU_dYdU1ePNPHZlgI9NrJ8";
+  static const apiKey = "AIzaSyCaZBQuycxfMfT3UCggswlfElLV2_JRvHU";
   final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
 
   Future<void> sendMsg() async {

@@ -15,27 +15,97 @@ class SegundaPantalla extends StatefulWidget {
 }
 
 class _SegundaPantallaState extends State<SegundaPantalla> {
-  @override
-  void initState() {
-    super.initState();
-    // Mostrar el Toast con el nombre del usuario
+  int _selectedRating = 0;
+
+  void showToast(String message) {
     Fluttertoast.showToast(
-      msg: "Usuario actual: ${widget.userName}",
+      msg: message,
       toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: Colors.black87,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
+  void showRatingDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        int localSelectedRating =
+            _selectedRating; // Variable local para actualizar el estado
+
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: StatefulBuilder(
+              builder: (context, setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      "Califica la App",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text("Por favor, selecciona una calificación:"),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        return IconButton(
+                          icon: Icon(
+                            index < localSelectedRating
+                                ? Icons.star
+                                : Icons.star_border,
+                            color: Colors.amber,
+                            size: 24,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              localSelectedRating = index + 1;
+                            });
+                          },
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        setState(() {
+                          _selectedRating = localSelectedRating;
+                        });
+                        showToast(
+                            "Gracias por calificar con $_selectedRating estrellas.");
+                      },
+                      child: const Text("Calificar"),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Obtener el usuario actual de Firebase
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Logo y título en una fila (horizontal)
             Padding(
               padding: const EdgeInsets.only(top: 30.0),
               child: Row(
@@ -58,8 +128,6 @@ class _SegundaPantallaState extends State<SegundaPantalla> {
                 ],
               ),
             ),
-
-            // Frase de motivación
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
@@ -69,8 +137,6 @@ class _SegundaPantallaState extends State<SegundaPantalla> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Bienvenida con el nombre del usuario
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
@@ -82,14 +148,10 @@ class _SegundaPantallaState extends State<SegundaPantalla> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Botón de estadísticas y estado
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: ElevatedButton(
-                onPressed: () {
-                  // Aquí puedes agregar la lógica para navegar a la pantalla de estadísticas
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   minimumSize: const Size(double.infinity, 50),
@@ -98,8 +160,6 @@ class _SegundaPantallaState extends State<SegundaPantalla> {
               ),
             ),
             const SizedBox(height: 10),
-
-            // Estado: bien en verde
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
@@ -112,49 +172,54 @@ class _SegundaPantallaState extends State<SegundaPantalla> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Botones en la mitad de la pantalla hacia abajo
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  // Botón de retos personales
-                  ElevatedButton(
-                    onPressed: () {
-                      // Lógica para los retos personales
-                    },
-                    child: const Text("Retos Personales"),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: buildOptionCard(
+                            "assets/img/retoPersonal.jpg",
+                            "Retos Personales",
+                            "Entrando a Retos Personales",
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: buildOptionCard(
+                            "assets/img/ejercicioDia.jpg",
+                            "Ejercicio del día",
+                            "Entrando a Ejercicio del día",
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  // Botón de ejercicio del día
-                  ElevatedButton(
-                    onPressed: () {
-                      // Lógica para el ejercicio del día
-                    },
-                    child: const Text("Ejercicio del día"),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Botón de plan alimenticio
-                  ElevatedButton(
-                    onPressed: () {
-                      // Lógica para el plan alimenticio
-                    },
-                    child: const Text("Plan Alimenticio"),
-                  ),
-                  // Botón de consejo
-                  ElevatedButton(
-                    onPressed: () {
-                      // Lógica para el consejo
-                    },
-                    child: const Text("Consejo"),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: buildOptionCard(
+                            "assets/img/comida.jpg",
+                            "Plan Alimenticio",
+                            "Entrando a Plan Alimenticio",
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: buildOptionCard(
+                            "assets/img/consejo.jpeg",
+                            "Consejo del día",
+                            "Entrando a Consejo del día",
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -163,8 +228,6 @@ class _SegundaPantallaState extends State<SegundaPantalla> {
           ],
         ),
       ),
-
-      // Barra de navegación en la parte inferior
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: const [
@@ -180,21 +243,64 @@ class _SegundaPantallaState extends State<SegundaPantalla> {
             icon: Icon(Icons.chat),
             label: "IA",
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star_rate),
+            label: "Califica la App",
+          ),
         ],
         onTap: (index) {
-          // Lógica para cada uno de los botones
           if (index == 0) {
-            // Lógica para emergencias
           } else if (index == 1) {
-            // Lógica para el perfil
           } else if (index == 2) {
-            // Navegar al chatbot o pantalla IA
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ChatScreen()),
             );
+          } else if (index == 3) {
+            showRatingDialog();
           }
         },
+      ),
+    );
+  }
+
+  Widget buildOptionCard(String imagePath, String title, String toastMessage) {
+    return GestureDetector(
+      onTap: () => showToast(toastMessage),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Opacity(
+            opacity: 0.8,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                image: DecorationImage(
+                  image: AssetImage(imagePath),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              width: MediaQuery.of(context).size.width * 0.4,
+              height: MediaQuery.of(context).size.width * 0.4,
+            ),
+          ),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              shadows: [
+                Shadow(
+                  offset: Offset(0, 1),
+                  blurRadius: 3.0,
+                  color: Colors.black,
+                ),
+              ],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

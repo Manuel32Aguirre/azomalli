@@ -68,6 +68,10 @@ flutter:
     - assets/img/robot.gif
     - assets/img/azomalli.png
     - assets/img/enviar.png
+    - assets/img/retoPersonal.jpg
+    - assets/img/ejercicioDia.jpg
+    - assets/img/comida.jpg
+    - assets/img/consejo.jpeg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

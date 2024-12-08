@@ -19,28 +19,32 @@ class _RegistroState extends State<Registro> {
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool _acceptedTerms = false;
 
   Future<void> _register() async {
+    if (!_acceptedTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Debe aceptar los términos y condiciones")),
+      );
+      return;
+    }
+
     if (_passwordController.text == _confirmPasswordController.text) {
       try {
-        // Crear el usuario en Firebase
         UserCredential userCredential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
 
-        // Obtener el usuario recién creado
         User? user = userCredential.user;
 
         if (user != null) {
-          // Crear la colección del usuario en Firestore
           await _createUserInFirestore(user);
 
-          // Enviar el correo de verificación
           await user.sendEmailVerification();
 
-          // Mostrar mensaje de éxito
           AwesomeDialog(
             context: context,
             dialogType: DialogType.success,
@@ -58,7 +62,6 @@ class _RegistroState extends State<Registro> {
           ).show();
         }
       } catch (e) {
-        // Mostrar mensaje de error en caso de fallo
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error: $e")),
         );
@@ -70,27 +73,54 @@ class _RegistroState extends State<Registro> {
     }
   }
 
-  // Función para crear la colección del usuario en Firestore
   Future<void> _createUserInFirestore(User user) async {
     try {
-      // Crear el documento con los campos vacíos
       await FirebaseFirestore.instance
           .collection('usuarios')
           .doc(user.uid)
           .set({
-        'nombre': '', // Nombres aún no asignados
-        'apellido': '', // Apellido paterno aún no asignado
-        'genero': '', // Género aún no asignado
-        'telefono': '', // Teléfono aún no asignado
-        'telefonoFamiliar': '', // Teléfono familiar aún no asignado
-        'nivelEstres': '', // El estado actual estará vacío por ahora
-        'edad': 0, // Edad aún no asignada
-        'estatura': 0.0, // Estatura aún no asignada
-        'nombreUsuario': '', // El nombre de usuario aún no se ha asignado
+        'nombre': '',
+        'apellido': '',
+        'genero': '',
+        'telefono': '',
+        'telefonoFamiliar': '',
+        'nivelEstres': '',
+        'edad': 0,
+        'estatura': 0.0,
+        'nombreUsuario': '',
       });
     } catch (e) {
       print("Error al crear la colección de usuario: $e");
     }
+  }
+
+  void showTermsModal() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Términos y Condiciones"),
+          content: SingleChildScrollView(
+            child: Text(
+              "Al usar la aplicación AZOMALLI, aceptas los siguientes términos:\n\n"
+              "1. La aplicación ofrece consejos y herramientas para gestionar el estrés, "
+              "pero no sustituye el asesoramiento profesional.\n"
+              "2. No nos hacemos responsables de posibles consecuencias derivadas del uso de la aplicación.\n"
+              "3. La información proporcionada es con fines educativos y de bienestar personal.\n"
+              "4. Cualquier decisión tomada basándose en nuestra app es responsabilidad del usuario.\n\n"
+              "Al aceptar, confirmas que has leído y aceptado estos términos.",
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Cerrar"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -174,6 +204,31 @@ class _RegistroState extends State<Registro> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _acceptedTerms,
+                          onChanged: (value) {
+                            setState(() {
+                              _acceptedTerms = value ?? false;
+                            });
+                          },
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: showTermsModal,
+                            child: const Text(
+                              "Acepto los términos y condiciones",
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 30),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -184,14 +239,13 @@ class _RegistroState extends State<Registro> {
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
-                      onPressed: _register, // Función de registro
+                      onPressed: _register,
                       child: const Text("Registrarse"),
                     ),
                   ],
                 ),
               ),
             ),
-            // Aquí puedes agregar los botones de Google y Facebook si lo deseas
           ],
         ),
       ),

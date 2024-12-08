@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:azomalli/chatbot.dart';
+import 'package:azomalli/perfil.dart';
 
 final FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -32,8 +33,7 @@ class _SegundaPantallaState extends State<SegundaPantalla> {
     showDialog(
       context: context,
       builder: (context) {
-        int localSelectedRating =
-            _selectedRating; // Variable local para actualizar el estado
+        int localSelectedRating = _selectedRating;
 
         return Dialog(
           shape: RoundedRectangleBorder(
@@ -250,13 +250,21 @@ class _SegundaPantallaState extends State<SegundaPantalla> {
         ],
         onTap: (index) {
           if (index == 0) {
+            // Lógica para emergencias (aquí vacío)
           } else if (index == 1) {
+            // Navegación al perfil
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePage()),
+            );
           } else if (index == 2) {
+            // Navegación al chatbot
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ChatScreen()),
             );
           } else if (index == 3) {
+            // Mostrar el diálogo de calificación
             showRatingDialog();
           }
         },

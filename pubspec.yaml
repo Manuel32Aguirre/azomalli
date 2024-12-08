@@ -40,6 +40,7 @@ dependencies:
   flutter_signin_button: ^2.0.0
   awesome_dialog: ^3.2.1
   cloud_firestore: ^5.5.0
+  shared_preferences: ^2.0.15
 
 
 
